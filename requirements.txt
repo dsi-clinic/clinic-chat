@@ -2,3 +2,4 @@ ruff
 streamlit
 llama-index
 llama-index-llms-openai
+GitPython
