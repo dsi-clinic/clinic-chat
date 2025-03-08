@@ -22,13 +22,14 @@ openai.api_key = st.secrets.OPENAI_API_KEY
 st.image("img/clinic.png", width=200)
 
 # Initialize the chat messages history
-if "messages" not in st.session_state:  
+if "messages" not in st.session_state:
     st.session_state.messages = [
         {
             "role": "assistant",
             "content": "Ask me a question about the Data Science Clinic!",
         }
     ]
+
 
 def download_repo(repo_url, repo_path):
     """Download a repo"""
@@ -76,14 +77,14 @@ selected = pills(
         "When are the final deliverables due?",
         "Where is the application?",
         "How do I set up my computer?",
-        "What are the one-pager requirements?"
+        "What are the one-pager requirements?",
     ],
     clearable=False,
     index=None,
 )
 
 # Prompt for user input and save to chat history
-if prompt := st.chat_input("Ask a question"):  
+if prompt := st.chat_input("Ask a question"):
     st.session_state.messages.append({"role": "user", "content": prompt})
 
 # Write message history to UI
