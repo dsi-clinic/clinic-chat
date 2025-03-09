@@ -43,7 +43,7 @@ def get_meta(file_path):
     url_prefix = "https://github.com/dsi-clinic/the-clinic/tree/main/"
     if file_path.startswith("/mount/src/"):
         file_path = file_path.replace(
-            "/mount/src/",
+            "/mount/src/clinic-chat/data/",
             url_prefix,
         )
     elif file_path.startswith("/project/data/"):
