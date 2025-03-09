@@ -38,6 +38,16 @@ def download_repo(repo_url, repo_path):
     git.Repo.clone_from(repo_url, repo_path)
 
 
+def get_meta(file_path):
+    """Builds url metadata."""
+    return {
+        "link": file_path.replace(
+            "/project/data/",
+            "https://github.com/dsi-clinic/the-clinic/tree/main/",
+        )
+    }
+
+
 @st.cache_resource(show_spinner=False)
 def load_data():
     """Load data from repository and build index."""
@@ -45,7 +55,10 @@ def load_data():
     repo_path = "./data"
     download_repo(repo_url, repo_path)
     reader = SimpleDirectoryReader(
-        input_dir=repo_path, required_exts=[".md", ".pdf"], recursive=True
+        input_dir=repo_path,
+        required_exts=[".md", ".pdf"],
+        recursive=True,
+        file_metadata=get_meta,
     )
     docs = reader.load_data()
     Settings.llm = OpenAI(
@@ -74,10 +87,10 @@ if "chat_engine" not in st.session_state.keys():
 selected = pills(
     "Choose a question to get started or write your own below.",
     [
-        "When are the final deliverables due?",
         "Where is the application?",
         "How do I set up my computer?",
         "What are the one-pager requirements?",
+        "What are the coding standards?",
     ],
     clearable=False,
     index=None,
