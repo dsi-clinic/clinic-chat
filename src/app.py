@@ -90,7 +90,7 @@ selected = pills(
         "Where is the application?",
         "How do I set up my computer?",
         "What are the one-pager requirements?",
-        "What are the coding standards?",
+        "Where can I find the coding standards? What's the gist?",
     ],
     clearable=False,
     index=None,
