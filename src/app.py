@@ -40,11 +40,20 @@ def download_repo(repo_url, repo_path):
 
 def get_meta(file_path):
     """Builds url metadata."""
-    return {
-        "link": file_path.replace(
-            "/project/data/",
-            "https://github.com/dsi-clinic/the-clinic/tree/main/",
+    url_prefix = "https://github.com/dsi-clinic/the-clinic/tree/main/"
+    if file_path.startswith("/mount/src/"):
+        file_path = file_path.replace(
+            "/mount/src/",
+            url_prefix,
         )
+    elif file_path.startswith("/project/data/"):
+        file_path = file_path.replace(
+            "/project/data/",
+            url_prefix,
+        )
+
+    return {
+        "link": file_path
     }
 
 
@@ -90,7 +99,7 @@ selected = pills(
         "Where is the application?",
         "How do I set up my computer?",
         "What are the one-pager requirements?",
-        "Where can I find the coding standards? What's the gist?",
+        "What are the coding standards, and where can I find them?",
     ],
     clearable=False,
     index=None,
