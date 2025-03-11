@@ -37,7 +37,7 @@ def download_repo(repo_url, repo_path):
 
 def get_meta(file_path):
     """Builds url metadata."""
-    url_prefix = "https://github.com/dsi-clinic/the-clinic/tree/main/"
+    url_prefix = "https://dsi-clinic.github.io/the-clinic/"
     if file_path.startswith("/mount/src/"):
         file_path = file_path.replace(
             "/mount/src/clinic-chat/data/",
@@ -48,6 +48,9 @@ def get_meta(file_path):
             "/project/data/",
             url_prefix,
         )
+
+    if file_path.endswith(".md"):
+        file_path = file_path.replace(".md", ".html")
 
     return {
         "link": file_path
