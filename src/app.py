@@ -4,9 +4,16 @@ import shutil
 from pathlib import Path
 
 import git
+import htmltabletomd
 import openai
 import streamlit as st
-from llama_index.core import Settings, SimpleDirectoryReader, VectorStoreIndex
+from llama_index.core import (
+    Document,
+    Settings,
+    SimpleDirectoryReader,
+    VectorStoreIndex,
+)
+from llama_index.core.readers.base import BaseReader
 from llama_index.llms.openai import OpenAI
 from streamlit_pills import pills
 
@@ -27,6 +34,7 @@ if "messages" not in st.session_state:
             "content": "Ask me a question about the Data Science Clinic!",
         }
     ]
+
 
 def download_repo(repo_url, repo_path):
     """Download a repo"""
@@ -52,9 +60,33 @@ def get_meta(file_path):
     if file_path.endswith(".md"):
         file_path = file_path.replace(".md", ".html")
 
-    return {
-        "link": file_path
-    }
+    return {"link": file_path}
+
+
+class OverrideReader(BaseReader):
+    """Overrides BaseReader"""
+
+    def load_data(self, file, extra_info=None):
+        """Custom data loader
+
+        Args:
+            file (Path): Path to the file to read.
+            extra_info (dict, optional): Extra args for Document loader. Defaults to None.
+
+        Returns:
+            list: List of Document objects.
+        """
+        if str(file).endswith("/projects.md"):
+            with Path.open(file) as f:
+                text = f.read()
+                text = htmltabletomd.convert_table(
+                    text, content_conversion_ind=True
+                )
+        else:
+            with Path.open(file) as f:
+                text = f.read()
+        # load_data returns a list of Document objects
+        return [Document(text=text, extra_info=extra_info or {})]
 
 
 @st.cache_resource(show_spinner=False)
@@ -68,6 +100,7 @@ def load_data():
         required_exts=[".md", ".pdf"],
         recursive=True,
         file_metadata=get_meta,
+        file_extractor={".md": OverrideReader()},
     )
     docs = reader.load_data()
     Settings.llm = OpenAI(
@@ -98,8 +131,7 @@ selected = pills(
     [
         "How do I get involved in Clinic?",
         "What are the coding standards?",
-        "How do I get an A in the class?"
-
+        "How do I get an A in the class?",
     ],
     clearable=False,
     index=None,
