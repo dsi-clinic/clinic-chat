@@ -35,6 +35,7 @@ if "messages" not in st.session_state:
         }
     ]
 
+
 def download_repo(repo_url, repo_path):
     """Download a repo"""
     if Path.exists(Path(repo_path)):
@@ -59,12 +60,12 @@ def get_meta(file_path):
     if file_path.endswith(".md"):
         file_path = file_path.replace(".md", ".html")
 
-    return {
-        "link": file_path
-    }
+    return {"link": file_path}
+
 
 class OverrideReader(BaseReader):
     """Overrides BaseReader"""
+
     def load_data(self, file, extra_info=None):
         """Custom data loader
 
@@ -76,17 +77,16 @@ class OverrideReader(BaseReader):
             list: List of Document objects.
         """
         if str(file).endswith("/projects.md"):
-            print("Loading project data")
-            with open(file) as f:
+            with Path.open(file) as f:
                 text = f.read()
-                text = htmltabletomd.convert_table(text, content_conversion_ind=True)
-                print(text)
+                text = htmltabletomd.convert_table(
+                    text, content_conversion_ind=True
+                )
         else:
-            with open(file) as f:
+            with Path.open(file) as f:
                 text = f.read()
         # load_data returns a list of Document objects
         return [Document(text=text, extra_info=extra_info or {})]
-
 
 
 @st.cache_resource(show_spinner=False)
@@ -100,7 +100,7 @@ def load_data():
         required_exts=[".md", ".pdf"],
         recursive=True,
         file_metadata=get_meta,
-        file_extractor={".md": OverrideReader()}
+        file_extractor={".md": OverrideReader()},
     )
     docs = reader.load_data()
     Settings.llm = OpenAI(
@@ -131,8 +131,7 @@ selected = pills(
     [
         "How do I get involved in Clinic?",
         "What are the coding standards?",
-        "How do I get an A in the class?"
-
+        "How do I get an A in the class?",
     ],
     clearable=False,
     index=None,
