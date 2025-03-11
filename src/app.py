@@ -11,15 +11,13 @@ from llama_index.llms.openai import OpenAI
 from streamlit_pills import pills
 
 st.set_page_config(
-    page_title="Clinic Chat, powered by LlamaIndex",
+    page_title="Clinic Chat",
     page_icon="./img/avatar.png",
     layout="centered",
     initial_sidebar_state="auto",
     menu_items=None,
 )
 openai.api_key = st.secrets.OPENAI_API_KEY
-
-st.image("img/clinic.png", width=200)
 
 # Initialize the chat messages history
 if "messages" not in st.session_state:
@@ -29,7 +27,6 @@ if "messages" not in st.session_state:
             "content": "Ask me a question about the Data Science Clinic!",
         }
     ]
-
 
 def download_repo(repo_url, repo_path):
     """Download a repo"""
@@ -96,10 +93,10 @@ if "chat_engine" not in st.session_state.keys():
 selected = pills(
     "Choose a question to get started or write your own below.",
     [
-        "Where is the application?",
-        "How do I set up my computer?",
-        "What are the one-pager requirements?",
-        "What are the coding standards, and where can I find them?",
+        "How do I get involved in Clinic?",
+        "What are the coding standards?",
+        "How do I get an A in the class?"
+
     ],
     clearable=False,
     index=None,
