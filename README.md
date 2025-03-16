@@ -14,9 +14,10 @@ make ingest REDIS_PASSWORD=<password>
 ```
 
 ### Run Streamlit App
-Create a [project secrets file](https://docs.streamlit.io/develop/concepts/connections/secrets-management) to store your OpenAI key at `.streamlit/secrets.toml`. The contents of this file should read:
+Create a [project secrets file](https://docs.streamlit.io/develop/concepts/connections/secrets-management) to store your keys at `.streamlit/secrets.toml`. The contents of this file should read:
 ```toml
-OPENAI_API_KEY = "sk-proj..."
+OPENAI_API_KEY="sk-proj..."
+REDIS_PASSWORD="xD2C..."
 ```
 
 Run the Streamlit application locally with the following command:
