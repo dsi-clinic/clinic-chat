@@ -1,4 +1,5 @@
 """LlamaIndex RAG app"""
+
 from pathlib import Path
 
 import openai
@@ -46,6 +47,7 @@ if "messages" not in st.session_state:
         }
     ]
 
+
 @st.cache_resource(show_spinner=False)
 def load_data():
     """Load index from redis vectorstore."""
@@ -59,13 +61,12 @@ def load_data():
     vector_store = RedisVectorStore(
         schema=IndexSchema.from_yaml(config_dir / "index_schema.yaml"),
         redis_url=redis_url,
-        overwrite=False
+        overwrite=False,
     )
     index = VectorStoreIndex.from_vector_store(
-        vector_store=vector_store,
-        embed_model=embed_model
+        vector_store=vector_store, embed_model=embed_model
     )
-    
+
     return index
 
 
