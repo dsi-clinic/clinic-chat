@@ -1,0 +1,26 @@
+index:
+  name: GDRIVE
+  prefix: doc
+  key_separator: ':'
+  storage_type: hash
+fields:
+- name: id
+  type: tag
+  attrs:
+    sortable: false
+- name: doc_id
+  type: tag
+  attrs:
+    sortable: false
+- name: text
+  type: text
+  attrs:
+    sortable: false
+- name: vector
+  type: vector
+  attrs:
+    dims: 384
+    algorithm: hnsw
+    datatype: float32
+    distance_metric: cosine
+version: 0.1.0
