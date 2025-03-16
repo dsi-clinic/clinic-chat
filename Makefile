@@ -17,3 +17,6 @@ run-app: build-only
 	docker run -it -v $(current_abs_path):/project -p 8501:8501 -t $(project_image_name) \
 	streamlit run src/app.py
 
+ingest: build-only
+	docker run -it -v $(current_abs_path):/project -e REDIS_PASSWORD=$(REDIS_PASSWORD) -t $(project_image_name) \
+	python src/ingest.py
