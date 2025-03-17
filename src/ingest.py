@@ -1,4 +1,5 @@
 """Ingestion pipeline for Clinic Chat."""
+
 import json
 import os
 import shutil
@@ -79,6 +80,7 @@ def load_key(file_path):
     """
     with file_path.open() as f:
         return json.load(f)
+
 
 def load_google_data(file_ids):
     """Custom google loader.
