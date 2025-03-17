@@ -1,0 +1,15 @@
+FROM python:3.12-slim-bookworm
+
+# Create working directory
+WORKDIR /app
+
+# Copy and install requirements
+COPY requirements/base.txt .
+COPY requirements/client.txt .
+RUN pip install -r client.txt
+
+# Copy source files
+COPY src/app.py ./src/app.py
+COPY .streamlit ./.streamlit
+
+CMD ["/bin/bash"]

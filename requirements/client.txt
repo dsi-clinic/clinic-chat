@@ -1,0 +1,8 @@
+-r base.txt
+streamlit
+streamlit-pills
+openai
+llama-index
+llama-index-llms-openai
+llama-index-embeddings-huggingface
+llama-index-vector-stores-redis

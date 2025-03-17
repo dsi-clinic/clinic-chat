@@ -8,9 +8,13 @@ Visit the [live demo](https://clinic-chat.streamlit.app/).
 ## Usage
 
 ### Ingest Data
-The code for ingesting data is located in `src/ingest.py`. It loads data from GitHub and Google Drive, parses metadata and inserts those documents into a remote Redis database.
+The code for ingesting data is located in `src/ingest.py`. It loads data from GitHub and Google Drive, parses metadata and inserts those documents into a remote Redis vector store.
+
+1. Create a Google service account key and save it to the root of this directory as `service_account_key.json`.
+2. Get a Redis database password.
+3. Run the following command:
 ```
-make ingest REDIS_PASSWORD=<password>
+make run-ingest REDIS_PASSWORD=<password>
 ```
 
 ### Run Streamlit App

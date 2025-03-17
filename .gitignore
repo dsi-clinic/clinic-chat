@@ -141,3 +141,10 @@ venv.bak/
 
 #wandb results
 wandb*
+
+# Account keys
+service_account_key.json
+
+# Streamlit
+
+.streamlit
