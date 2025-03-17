@@ -47,6 +47,8 @@ def get_meta(file_path):
         dict: Metadata
     """
     url_prefix = "https://dsi-clinic.github.io/the-clinic/"
+
+    # TODO: this is lazy and dumb
     if file_path.startswith("/mount/src/"):
         file_path = file_path.replace(
             "/mount/src/clinic-chat/data/",
