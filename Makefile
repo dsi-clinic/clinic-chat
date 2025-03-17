@@ -4,19 +4,21 @@ current_dir := $(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
 current_abs_path := $(subst Makefile,,$(mkfile_path))
 
 # project
-project_image_name := "clinic-chat"
-project_container_name := "clinic-chat-container"
-project_dir := "$(current_abs_path)"
+app_image_name := "clinic-chat-app"
+backend_image_name := "clinic-chat-backend"
 
-.PHONY: build-only
+.PHONY: build-app build-backend
 
-build-only:
-	docker build -t $(project_image_name) -f Dockerfile $(current_abs_path)
+build-app:
+	docker build -t $(app_image_name) -f docker/Dockerfile.client $(current_abs_path)
 
-run-app: build-only
-	docker run -it -v $(current_abs_path):/project -p 8501:8501 -t $(project_image_name) \
+build-backend:
+	docker build -t $(backend_image_name) -f docker/Dockerfile.backend $(current_abs_path)
+
+run-app: build-app
+	docker run -it -v $(current_abs_path):/app -p 8501:8501 -t $(app_image_name) \
 	streamlit run src/app.py
 
-ingest: build-only
-	docker run -it -v $(current_abs_path):/project -e REDIS_PASSWORD=$(REDIS_PASSWORD) -t $(project_image_name) \
+run-ingest: build-backend
+	docker run -it -v $(current_abs_path):/project -e REDIS_PASSWORD=$(REDIS_PASSWORD) -t $(backend_image_name) \
 	python src/ingest.py

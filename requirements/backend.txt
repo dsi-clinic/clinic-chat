@@ -1,10 +1,9 @@
-ruff
-streamlit
+-r base.txt
+
+GitPython
+htmltabletomd
 llama-index
 llama-index-llms-openai
-GitPython
-streamlit-pills
-htmltabletomd
 llama-index-embeddings-huggingface
 llama-index-readers-google
 llama-index-vector-stores-redis

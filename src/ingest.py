@@ -1,5 +1,5 @@
 """Ingestion pipeline for Clinic Chat."""
-
+import json
 import os
 import shutil
 from pathlib import Path
@@ -69,6 +69,17 @@ def get_meta(file_path):
     return {"link": file_path}
 
 
+def load_key(file_path):
+    """Loads key from a file.
+
+    Args:
+        file_path (Path): Path to service account file
+    Returns:
+        dict: Dict of service account key
+    """
+    with file_path.open() as f:
+        return json.load(f)
+
 def load_google_data(file_ids):
     """Custom google loader.
 
@@ -78,7 +89,9 @@ def load_google_data(file_ids):
     Returns:
         list: list of Documents
     """
-    loader = GoogleDriveReader()
+    file_dir = Path(__file__).parent.parent
+    service_account_key = load_key(file_dir / "service_account_key.json")
+    loader = GoogleDriveReader(service_account_key=service_account_key)
     docs = loader.load_data(file_ids=file_ids)
     for doc in docs:
         doc.id_ = doc.metadata.get("file path", "none")
@@ -165,7 +178,6 @@ def main():
             "1XtyqoFgvX2aUhKBBjA0Oba8DbvZsuf3sdQeFH1Nt1TA",
             "1E5wyLk4vXHeg_c0WmxvVYlKI9wnTj7P4pktkH7csLn8",
             "1ovkawtyIw7Itfx1Kj1uw0wnKyrMNBpdldNCFsTd2fcw",
-            "1rzKh2IO6lg7XjKIZBZ4bFsv-gut2rPWkDzALLoZpzAw",
         ]
     )
 
