@@ -8,19 +8,23 @@ from pathlib import Path
 import dotenv
 import git
 import htmltabletomd
+import redis
 from llama_index.core import (
     Document,
     Settings,
     SimpleDirectoryReader,
 )
 from llama_index.core.ingestion import (
+    DocstoreStrategy,
+    IngestionCache,
     IngestionPipeline,
 )
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.readers.base import BaseReader
-from llama_index.core.storage.docstore import SimpleDocumentStore
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.readers.google import GoogleDriveReader
+from llama_index.storage.docstore.redis import RedisDocumentStore
+from llama_index.storage.kvstore.redis import RedisKVStore as RedisCache
 from llama_index.vector_stores.redis import RedisVectorStore
 from redisvl.schema import IndexSchema
 
@@ -194,8 +198,17 @@ def main():
     redis_host = "redis-16124.c261.us-east-1-4.ec2.redns.redis-cloud.com"
     redis_port = 16124
     redis_url = f"redis://{redis_user}:{redis_pwd}@{redis_host}:{redis_port}"
+
+    redis_client = redis.Redis.from_url(redis_url)
     vector_store = RedisVectorStore(
-        redis_url=redis_url, overwrite=True, schema=custom_schema
+        redis_client=redis_client, overwrite=True, schema=custom_schema
+    )
+    cache = IngestionCache(
+        cache=RedisCache(redis_client=redis_client),
+        collection="redis_cache",
+    )
+    docstore = RedisDocumentStore.from_redis_client(
+        redis_client=redis_client, namespace="document_store"
     )
 
     # Create and run ingestion pipeline
@@ -204,8 +217,10 @@ def main():
             SentenceSplitter(),
             embed_model,
         ],
-        docstore=SimpleDocumentStore(),
+        cache=cache,
+        docstore=docstore,
         vector_store=vector_store,
+        docstore_strategy=DocstoreStrategy.UPSERTS,
     )
     pipeline.run(documents=docs)
 
