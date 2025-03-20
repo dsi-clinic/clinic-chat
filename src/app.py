@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import openai
+import redis
 import streamlit as st
 from llama_index.core import (
     Settings,
@@ -52,15 +53,23 @@ if "messages" not in st.session_state:
 def load_data():
     """Load index from redis vectorstore."""
     embed_model = Settings.embed_model
-    redis_user = "default"
-    redis_pwd = st.secrets.REDIS_PASSWORD
-    redis_host = "redis-16124.c261.us-east-1-4.ec2.redns.redis-cloud.com"
-    redis_port = 16124
-    redis_url = f"redis://{redis_user}:{redis_pwd}@{redis_host}:{redis_port}"
+
+    redis_host = st.secrets.REDIS_HOST
+    redis_port = st.secrets.REDIS_PORT
+    redis_url = f"redis://{redis_host}:{redis_port}"
+
+    if redis_host != "localhost":
+        redis_user = "default"
+        redis_pwd = st.secrets.REDIS_PASSWORD
+        redis_url = (
+            f"redis://{redis_user}:{redis_pwd}@{redis_host}:{redis_port}"
+        )
+
+    redis_client = redis.Redis.from_url(redis_url)
 
     vector_store = RedisVectorStore(
+        redis_client=redis_client,
         schema=IndexSchema.from_yaml(config_dir / "index_schema.yaml"),
-        redis_url=redis_url,
         overwrite=False,
     )
     index = VectorStoreIndex.from_vector_store(
