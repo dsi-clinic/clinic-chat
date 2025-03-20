@@ -8,27 +8,35 @@ from pathlib import Path
 import dotenv
 import git
 import htmltabletomd
+import openai
 import redis
 from llama_index.core import (
     Document,
     Settings,
     SimpleDirectoryReader,
 )
+from llama_index.core.extractors import (
+    KeywordExtractor,
+    QuestionsAnsweredExtractor,
+    SummaryExtractor,
+    TitleExtractor,
+)
 from llama_index.core.ingestion import (
     DocstoreStrategy,
-    IngestionCache,
     IngestionPipeline,
 )
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.readers.base import BaseReader
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.llms.openai import OpenAI
 from llama_index.readers.google import GoogleDriveReader
 from llama_index.storage.docstore.redis import RedisDocumentStore
-from llama_index.storage.kvstore.redis import RedisKVStore as RedisCache
 from llama_index.vector_stores.redis import RedisVectorStore
 from redisvl.schema import IndexSchema
 
 dotenv.load_dotenv()
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 def download_repo(repo_url, to_path):
@@ -67,6 +75,11 @@ def get_meta(file_path):
     elif file_path.startswith("/Users/hannifan/work/clinic-chat/data/"):
         file_path = file_path.replace(
             "/Users/hannifan/work/clinic-chat/data/",
+            url_prefix,
+        )
+    elif file_path.startswith("/Users/tjh/work/clinic-chat/data/"):
+        file_path = file_path.replace(
+            "/Users/tjh/work/clinic-chat/data/",
             url_prefix,
         )
 
@@ -141,6 +154,10 @@ def main():
     embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
     Settings.embed_model = embed_model
 
+    # Chunk size
+    Settings.chunk_size = 1024
+    Settings.chunk_overlap = 20
+
     # Define and save schema
     custom_schema = IndexSchema.from_dict(
         {
@@ -190,34 +207,40 @@ def main():
     )
 
     # Combine local and google docs
-    docs = google_docs + local_docs
+    docs = local_docs + google_docs
 
     # Set up Redis connection and vectorstore
-    redis_user = "default"
-    redis_pwd = os.getenv("REDIS_PASSWORD")
-    redis_host = "redis-16124.c261.us-east-1-4.ec2.redns.redis-cloud.com"
-    redis_port = 16124
-    redis_url = f"redis://{redis_user}:{redis_pwd}@{redis_host}:{redis_port}"
+    redis_host = os.getenv("REDIS_HOST")
+    redis_port = os.getenv("REDIS_PORT")
+    redis_url = f"redis://{redis_host}:{redis_port}"
+
+    if redis_host != "localhost":
+        redis_user = "default"
+        redis_pwd = os.getenv("REDIS_PASSWORD")
+        redis_url = (
+            f"redis://{redis_user}:{redis_pwd}@{redis_host}:{redis_port}"
+        )
 
     redis_client = redis.Redis.from_url(redis_url)
     vector_store = RedisVectorStore(
         redis_client=redis_client, overwrite=True, schema=custom_schema
     )
-    cache = IngestionCache(
-        cache=RedisCache(redis_client=redis_client),
-        collection="redis_cache",
-    )
     docstore = RedisDocumentStore.from_redis_client(
         redis_client=redis_client, namespace="document_store"
     )
+
+    llm = OpenAI(model="gpt-4o-mini")
 
     # Create and run ingestion pipeline
     pipeline = IngestionPipeline(
         transformations=[
             SentenceSplitter(),
+            TitleExtractor(nodes=5, llm=llm),
+            KeywordExtractor(keywords=10, llm=llm),
+            QuestionsAnsweredExtractor(questions=3, llm=llm),
+            SummaryExtractor(summaries=["self"], llm=llm),
             embed_model,
         ],
-        cache=cache,
         docstore=docstore,
         vector_store=vector_store,
         docstore_strategy=DocstoreStrategy.UPSERTS,
