@@ -27,6 +27,20 @@ st.set_page_config(
     initial_sidebar_state="auto",
     menu_items=None,
 )
+
+# Hide Streamlit menu
+hide_streamlit_style = """
+        <style>
+            /* Hide the Streamlit header and menu */
+            header {visibility: hidden;}
+            /* Optionally, hide the footer */
+            .streamlit-footer {display: none;}
+            /* Hide your specific div class, replace class name with the one you identified */
+            #MainMenu {display: none;}
+        </style>
+        """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 openai.api_key = st.secrets.OPENAI_API_KEY
 Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
 Settings.llm = OpenAI(
