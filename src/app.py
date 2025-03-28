@@ -18,9 +18,11 @@ from streamlit_pills import pills
 parent_dir = Path(__file__).parent.parent
 config_dir = parent_dir / "config"
 
+avatar_url = "https://raw.githubusercontent.com/dsi-clinic/clinic-chat/refs/heads/main/img/avatar.png"
+
 st.set_page_config(
     page_title="Clinic Chat",
-    page_icon="./img/avatar.png",
+    page_icon=avatar_url,
     layout="centered",
     initial_sidebar_state="auto",
     menu_items=None,
@@ -102,11 +104,12 @@ selected = pills(
 if prompt := st.chat_input("Ask a question"):
     st.session_state.messages.append({"role": "user", "content": prompt})
 
+
 # Write message history to UI
 for message in st.session_state.messages:
     # If message is from assistant, write it to the UI as a chat message
     if message["role"] == "assistant":
-        with st.chat_message(message["role"], avatar="./img/avatar.png"):
+        with st.chat_message(message["role"], avatar=avatar_url):
             st.write(message["content"])
     else:
         with st.chat_message(message["role"]):
@@ -127,7 +130,7 @@ if selected and selected not in st.session_state.get(
 
 # If last message is not from assistant, generate a new response
 if st.session_state.messages[-1]["role"] != "assistant":
-    with st.chat_message("assistant", avatar="./img/avatar.png"):
+    with st.chat_message("assistant", avatar=avatar_url):
         response_stream = st.session_state.chat_engine.stream_chat(prompt)
         st.write_stream(response_stream.response_gen)
 
