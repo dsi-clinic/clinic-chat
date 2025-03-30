@@ -1,5 +1,6 @@
 """LlamaIndex RAG app"""
 
+import random
 from pathlib import Path
 
 import openai
@@ -103,13 +104,34 @@ if "chat_engine" not in st.session_state.keys():
         chat_mode="condense_question", verbose=True, streaming=True
     )
 
-selected = pills(
-    "Choose a question to get started or write your own below.",
-    [
+
+def select_questions():
+    """Return a list of predefined questions for the pills."""
+    # Predefined questions related to the Data Science Clinic
+    full_questions = [
+        "What is the Data Science Clinic?",
+        "What are the main features of the Clinic?",
+        "How do I apply to join the Clinic?",
+        "What is the schedule for the Clinic?",
+        "What is the expected workload?",
+        "Can I participate remotely?",
         "How do I get involved in Clinic?",
         "What are the coding standards?",
         "How do I get an A in the class?",
-    ],
+    ]
+    # Randomly select 3 questions from the full list
+    return random.sample(full_questions, 3)
+
+
+if "selected_pills" not in st.session_state.keys():
+    # Initialize selected pills
+    st.session_state.selected_pills = []
+    st.session_state.selected_pills.extend(select_questions())
+
+
+selected = pills(
+    "Choose a question to get started or write your own below.",
+    st.session_state.selected_pills,
     clearable=False,
     index=None,
 )
