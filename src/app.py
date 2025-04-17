@@ -12,6 +12,7 @@ from llama_index.core import (
     VectorStoreIndex,
 )
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.llms.openai import OpenAI
 from llama_index.vector_stores.redis import RedisVectorStore
 from redisvl.schema import IndexSchema
@@ -48,7 +49,8 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 current_date_string = datetime.datetime.now().strftime("%B %d, %Y")
 
 openai.api_key = st.secrets.OPENAI_API_KEY
-Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5", cache_folder=parent_dir / "embeddings_cache")
+# Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5", cache_folder=parent_dir / "embeddings_cache")
+Settings.embed_model = OpenAIEmbedding()
 Settings.llm = OpenAI(
     model="gpt-4o-mini",
     temperature=0.8,
