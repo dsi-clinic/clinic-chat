@@ -1,5 +1,5 @@
 index:
-  name: GDRIVE
+  name: clinic-index
   prefix: doc
   key_separator: ':'
   storage_type: hash
