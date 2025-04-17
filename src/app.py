@@ -1,5 +1,6 @@
 """LlamaIndex RAG app"""
 
+import datetime
 import random
 from pathlib import Path
 
@@ -42,18 +43,24 @@ hide_streamlit_style = """
         """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
+# Configure some settings
+
+current_date_string = datetime.datetime.now().strftime("%B %d, %Y")
+
 openai.api_key = st.secrets.OPENAI_API_KEY
-Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
+Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5", cache_folder=parent_dir / "embeddings_cache")
 Settings.llm = OpenAI(
     model="gpt-4o-mini",
     temperature=0.8,
-    system_prompt="""You are an expert on 
+    system_prompt=f"""You are an expert on 
     the Data Science Clinic and your 
     job is to answer questions. 
     Assume that all questions are related 
     to the Data Science Clinic. Keep 
     your answers based on 
-    facts – do not hallucinate features.""",
+    facts – do not hallucinate features. The
+    current date is {current_date_string}.
+    """,
 )
 
 # Initialize the chat messages history
@@ -114,7 +121,6 @@ def select_questions():
         "How do I apply to join the Clinic?",
         "What is the schedule for the Clinic?",
         "What is the expected workload?",
-        "Can I participate remotely?",
         "How do I get involved in Clinic?",
         "What are the coding standards?",
         "How do I get an A in the class?",
