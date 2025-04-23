@@ -5,6 +5,7 @@ import random
 from pathlib import Path
 
 import openai
+import tiktoken
 import redis
 import streamlit as st
 from llama_index.core import (
@@ -17,6 +18,7 @@ from llama_index.llms.openai import OpenAI
 from llama_index.vector_stores.redis import RedisVectorStore
 from redisvl.schema import IndexSchema
 from streamlit_pills import pills
+from llama_index.core.node_parser import SentenceSplitter
 
 parent_dir = Path(__file__).parent.parent
 config_dir = parent_dir / "config"
@@ -63,6 +65,12 @@ Settings.llm = OpenAI(
     facts – do not hallucinate features. The
     current date is {current_date_string}.
     """,
+)
+
+Settings.text_splitter = SentenceSplitter(
+    chunk_size=512,
+    chunk_overlap=50,
+    tokenizer=tiktoken.encoding_for_model("gpt-3.5-turbo").encode
 )
 
 # Initialize the chat messages history
