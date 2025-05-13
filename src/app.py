@@ -8,6 +8,7 @@ import openai
 import tiktoken
 import redis
 import streamlit as st
+import streamlit.components.v1 as components
 from llama_index.core import (
     Settings,
     VectorStoreIndex,
@@ -19,6 +20,7 @@ from llama_index.vector_stores.redis import RedisVectorStore
 from redisvl.schema import IndexSchema
 from streamlit_pills import pills
 from llama_index.core.node_parser import SentenceSplitter
+
 
 parent_dir = Path(__file__).parent.parent
 config_dir = parent_dir / "config"
@@ -46,11 +48,10 @@ hide_streamlit_style = """
         """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
-# Insert tracking code
-tracking_code = """
+components.html("""
     <script defer src="https://analytics.ds.uchicago.edu/script.js" data-website-id="0dc123f7-d934-469b-876d-21dc6d430ac9"></script>
-"""
-st.markdown(tracking_code, unsafe_allow_html=True)
+""", height=0)
+
 
 # Configure some settings
 
