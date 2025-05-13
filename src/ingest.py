@@ -28,6 +28,7 @@ from llama_index.core.ingestion import (
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.readers.base import BaseReader
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.llms.openai import OpenAI
 from llama_index.readers.google import GoogleDriveReader
 from llama_index.storage.docstore.redis import RedisDocumentStore
@@ -138,10 +139,14 @@ class OverrideReader(BaseReader):
                 text = htmltabletomd.convert_table(
                     text, content_conversion_ind=True
                 )
+        elif "/admin/" in str(file):
+            print(str(file))
+            # skip admin files
+            return ""
         else:
             with Path.open(file) as f:
                 text = f.read()
-        # load_data returns a list of Document objects
+
         return [Document(text=text, extra_info=extra_info or {})]
 
 
@@ -151,7 +156,7 @@ def main():
     config_dir = parent_dir / "config"
 
     # changing the global default
-    embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
+    embed_model = OpenAIEmbedding()
     Settings.embed_model = embed_model
 
     # Chunk size
@@ -161,19 +166,18 @@ def main():
     # Define and save schema
     custom_schema = IndexSchema.from_dict(
         {
-            "index": {"name": "GDRIVE", "prefix": "doc"},
+            "index": {"name": "clinic-index", "prefix": "doc"},
             # customize fields that are indexed
             "fields": [
                 # required fields for llamaindex
                 {"type": "tag", "name": "id"},
                 {"type": "tag", "name": "doc_id"},
                 {"type": "text", "name": "text"},
-                # custom vector field for bge-small-en-v1.5 embeddings
                 {
                     "type": "vector",
                     "name": "vector",
                     "attrs": {
-                        "dims": 384,
+                        "dims": 1536,
                         "algorithm": "hnsw",
                         "distance_metric": "cosine",
                     },
@@ -215,6 +219,7 @@ def main():
     redis_url = f"redis://{redis_host}:{redis_port}"
 
     if redis_host != "localhost":
+        print("Using Redis with authentication")
         redis_user = "default"
         redis_pwd = os.getenv("REDIS_PASSWORD")
         redis_url = (
@@ -235,10 +240,10 @@ def main():
     pipeline = IngestionPipeline(
         transformations=[
             SentenceSplitter(),
-            TitleExtractor(nodes=5, llm=llm),
-            KeywordExtractor(keywords=10, llm=llm),
-            QuestionsAnsweredExtractor(questions=3, llm=llm),
-            SummaryExtractor(summaries=["self"], llm=llm),
+            # TitleExtractor(nodes=5, llm=llm),
+            # KeywordExtractor(keywords=10, llm=llm),
+            # QuestionsAnsweredExtractor(questions=3, llm=llm),
+            # SummaryExtractor(summaries=["self"], llm=llm),
             embed_model,
         ],
         docstore=docstore,
