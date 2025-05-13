@@ -46,6 +46,12 @@ hide_streamlit_style = """
         """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
+# Insert tracking code
+tracking_code = """
+    <script defer src="https://analytics.ds.uchicago.edu/script.js" data-website-id="0dc123f7-d934-469b-876d-21dc6d430ac9"></script>
+"""
+st.markdown(tracking_code, unsafe_allow_html=True)
+
 # Configure some settings
 
 current_date_string = datetime.datetime.now().strftime("%B %d, %Y")
