@@ -1,26 +1,23 @@
 """LlamaIndex RAG app"""
 
-import datetime
 import random
 from pathlib import Path
 
 import openai
-import tiktoken
 import redis
 import streamlit as st
 import streamlit.components.v1 as components
+import tiktoken
 from llama_index.core import (
     Settings,
     VectorStoreIndex,
 )
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.core.node_parser import SentenceSplitter
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.llms.openai import OpenAI
 from llama_index.vector_stores.redis import RedisVectorStore
 from redisvl.schema import IndexSchema
 from streamlit_pills import pills
-from llama_index.core.node_parser import SentenceSplitter
-
 
 parent_dir = Path(__file__).parent.parent
 config_dir = parent_dir / "config"
@@ -49,9 +46,12 @@ hide_streamlit_style = """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 if st.secrets.ENV == "production":
-    components.html("""
+    components.html(
+        """
         <script defer src="https://analytics.ds.uchicago.edu/script.js" data-website-id="0dc123f7-d934-469b-876d-21dc6d430ac9"></script>
-    """, height=0)
+    """,
+        height=0,
+    )
 
 
 # Configure some settings
@@ -73,7 +73,7 @@ Settings.llm = OpenAI(
 Settings.text_splitter = SentenceSplitter(
     chunk_size=512,
     chunk_overlap=50,
-    tokenizer=tiktoken.encoding_for_model("gpt-3.5-turbo").encode
+    tokenizer=tiktoken.encoding_for_model("gpt-3.5-turbo").encode,
 )
 
 # Initialize the chat messages history

@@ -7,5 +7,6 @@ llama-index-llms-openai
 llama-index-embeddings-huggingface
 llama-index-readers-google
 llama-index-vector-stores-redis
+llama-index-storage-docstore-redis
 openpyxl
 redis

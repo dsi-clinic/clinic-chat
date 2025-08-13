@@ -7,4 +7,5 @@ llama-index==0.12.24
 llama-index-llms-openai==0.3.25
 llama-index-embeddings-huggingface==0.5.2
 llama-index-vector-stores-redis==0.5.0
+llama-index-storage-docstore-redis
 tiktoken==0.9.0

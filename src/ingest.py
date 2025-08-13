@@ -15,21 +15,13 @@ from llama_index.core import (
     Settings,
     SimpleDirectoryReader,
 )
-from llama_index.core.extractors import (
-    KeywordExtractor,
-    QuestionsAnsweredExtractor,
-    SummaryExtractor,
-    TitleExtractor,
-)
 from llama_index.core.ingestion import (
     DocstoreStrategy,
     IngestionPipeline,
 )
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.readers.base import BaseReader
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_index.llms.openai import OpenAI
 from llama_index.readers.google import GoogleDriveReader
 from llama_index.storage.docstore.redis import RedisDocumentStore
 from llama_index.vector_stores.redis import RedisVectorStore
@@ -60,29 +52,17 @@ def get_meta(file_path):
     Returns:
         dict: Metadata
     """
-    url_prefix = "https://dsi-clinic.github.io/the-clinic/"
+    url_prefix = "https://clinic.ds.uchicago.edu/"
 
-    # TODO: this is lazy and dumb
-    if file_path.startswith("/mount/src/"):
-        file_path = file_path.replace(
-            "/mount/src/clinic-chat/data/",
-            url_prefix,
-        )
-    elif file_path.startswith("/project/data/"):
-        file_path = file_path.replace(
-            "/project/data/",
-            url_prefix,
-        )
-    elif file_path.startswith("/Users/hannifan/work/clinic-chat/data/"):
-        file_path = file_path.replace(
-            "/Users/hannifan/work/clinic-chat/data/",
-            url_prefix,
-        )
-    elif file_path.startswith("/Users/tjh/work/clinic-chat/data/"):
-        file_path = file_path.replace(
-            "/Users/tjh/work/clinic-chat/data/",
-            url_prefix,
-        )
+    # Find the position of "data/" in the path and replace everything before it
+    data_index = file_path.find("/data/")
+    if data_index != -1:
+        # Replace everything up to and including "/data/" with the URL prefix
+        file_path = (
+            url_prefix + file_path[data_index + 6 :]
+        )  # +6 to skip "/data/"
+    else:
+        print(f"Warning: 'data/' not found in file path: {file_path}")
 
     if file_path.endswith(".md"):
         file_path = file_path.replace(".md", ".html")
@@ -140,7 +120,6 @@ class OverrideReader(BaseReader):
                     text, content_conversion_ind=True
                 )
         elif "/admin/" in str(file):
-            print(str(file))
             # skip admin files
             return ""
         else:
@@ -219,7 +198,6 @@ def main():
     redis_url = f"redis://{redis_host}:{redis_port}"
 
     if redis_host != "localhost":
-        print("Using Redis with authentication")
         redis_user = "default"
         redis_pwd = os.getenv("REDIS_PASSWORD")
         redis_url = (
@@ -234,16 +212,10 @@ def main():
         redis_client=redis_client, namespace="document_store"
     )
 
-    llm = OpenAI(model="gpt-4o-mini")
-
     # Create and run ingestion pipeline
     pipeline = IngestionPipeline(
         transformations=[
             SentenceSplitter(),
-            # TitleExtractor(nodes=5, llm=llm),
-            # KeywordExtractor(keywords=10, llm=llm),
-            # QuestionsAnsweredExtractor(questions=3, llm=llm),
-            # SummaryExtractor(summaries=["self"], llm=llm),
             embed_model,
         ],
         docstore=docstore,
