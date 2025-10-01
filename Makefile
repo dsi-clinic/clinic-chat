@@ -20,5 +20,10 @@ run-app: build-app
 	streamlit run src/app.py
 
 run-ingest: build-backend
-	docker run -v $(current_abs_path):/project -e REDIS_PASSWORD=$(REDIS_PASSWORD) $(backend_image_name) \
-	uv run python src/ingest.py
+	docker run -v $(current_abs_path):/project \
+		-e REDIS_PASSWORD=$(REDIS_PASSWORD) \
+		-e REDIS_HOST=$(REDIS_HOST) \
+		-e REDIS_PORT=$(REDIS_PORT) \
+		-e OPENAI_API_KEY=$(OPENAI_API_KEY) \
+		$(backend_image_name) \
+		uv run python src/ingest.py
