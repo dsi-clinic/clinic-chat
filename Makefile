@@ -20,5 +20,5 @@ run-app: build-app
 	streamlit run src/app.py
 
 run-ingest: build-backend
-	docker run -it -v $(current_abs_path):/project -e REDIS_PASSWORD=$(REDIS_PASSWORD) -t $(backend_image_name) \
+	docker run -v $(current_abs_path):/project -e REDIS_PASSWORD=$(REDIS_PASSWORD) $(backend_image_name) \
 	python src/ingest.py

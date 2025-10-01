@@ -1,3 +1,31 @@
+[project]
+name = "clinic-chat"
+version = "0.1.0"
+description = "Clinic Chat application"
+requires-python = ">=3.12"
+dependencies = [
+    "ruff==0.11.0",
+    "python-dotenv==1.0.1",
+    "streamlit==1.43.2",
+    "streamlit-pills==0.3.0",
+    "openai==1.66.3",
+    "llama-index==0.12.24",
+    "llama-index-llms-openai==0.3.25",
+    "llama-index-embeddings-huggingface==0.5.2",
+    "llama-index-vector-stores-redis==0.5.0",
+    "llama-index-storage-docstore-redis",
+    "tiktoken==0.9.0",
+    "GitPython",
+    "htmltabletomd",
+    "llama-index-readers-google",
+    "openpyxl",
+    "redis",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [tool.ruff]
 line-length = 80
 indent-width = 4

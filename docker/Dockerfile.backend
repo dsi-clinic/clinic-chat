@@ -1,16 +1,19 @@
-FROM python:3.12-slim-bookworm
+# This is a basic docker image for use in the clinic
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
+# Switch to root to update and install tools
+RUN apt-get update && apt-get install -y curl git
 # Create working directory
 WORKDIR /project
 
-# Copy and install requirements
-COPY requirements/base.txt .
-COPY requirements/backend.txt .
-RUN pip install -r backend.txt
+COPY pyproject.toml .
 
-# Install git
-RUN apt-get update
-RUN apt-get install -y git
+# Resolve and install Python packages from pyproject/uv.lock
+RUN /usr/local/bin/uv venv
+ENV VIRTUAL_ENV=/project/.venv
+ENV PATH="/project/.venv/bin:$PATH"
+ENV PYTHONPATH=/project/src
+RUN uv sync
 
 # Copy source files
 COPY src ./src
