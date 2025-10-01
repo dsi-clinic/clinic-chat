@@ -6,14 +6,14 @@ RUN apt-get update && apt-get install -y curl git
 # Create working directory
 WORKDIR /project
 
-COPY pyproject.toml .
+COPY pyproject.toml uv.lock ./
 
 # Resolve and install Python packages from pyproject/uv.lock
 RUN /usr/local/bin/uv venv
 ENV VIRTUAL_ENV=/project/.venv
 ENV PATH="/project/.venv/bin:$PATH"
 ENV PYTHONPATH=/project/src
-RUN uv sync
+RUN uv sync --frozen
 
 # Copy source files
 COPY src ./src
