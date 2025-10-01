@@ -21,4 +21,4 @@ run-app: build-app
 
 run-ingest: build-backend
 	docker run -v $(current_abs_path):/project -e REDIS_PASSWORD=$(REDIS_PASSWORD) $(backend_image_name) \
-	/project/.venv/bin/python src/ingest.py
+	uv run python src/ingest.py
