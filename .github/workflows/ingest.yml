@@ -1,0 +1,31 @@
+name: Data Ingestion
+
+on:
+  workflow_dispatch:  # Allows manual triggering
+  schedule:
+    - cron: '0 2 * * 0'  # Run weekly on Sunday at 2 AM UTC
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/ingest.py'
+      - 'data/**'
+      - 'config/**'
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Run data ingestion
+      run: make run-ingest
+      env:
+        REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+        REDIS_HOST: ${{ secrets.REDIS_HOST }}
+        REDIS_PORT: ${{ secrets.REDIS_PORT }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
