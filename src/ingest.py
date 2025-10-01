@@ -181,16 +181,16 @@ def main():
     )
     local_docs = reader.load_data()
 
-    google_docs = load_google_data(
-        file_ids=[
-            "1XtyqoFgvX2aUhKBBjA0Oba8DbvZsuf3sdQeFH1Nt1TA",
-            "1E5wyLk4vXHeg_c0WmxvVYlKI9wnTj7P4pktkH7csLn8",
-            "1ovkawtyIw7Itfx1Kj1uw0wnKyrMNBpdldNCFsTd2fcw",
-        ]
-    )
+    # google_docs = load_google_data(
+    #     file_ids=[
+    #         "1XtyqoFgvX2aUhKBBjA0Oba8DbvZsuf3sdQeFH1Nt1TA",
+    #         "1E5wyLk4vXHeg_c0WmxvVYlKI9wnTj7P4pktkH7csLn8",
+    #         "1ovkawtyIw7Itfx1Kj1uw0wnKyrMNBpdldNCFsTd2fcw",
+    #     ]
+    # )
 
     # Combine local and google docs
-    docs = local_docs + google_docs
+    docs = local_docs  # + google_docs
 
     # Set up Redis connection and vectorstore
     redis_host = os.getenv("REDIS_HOST")
